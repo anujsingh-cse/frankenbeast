@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, writeFileSync, unlinkSync } from 'node:fs';
+import { chmodSync, cpSync, existsSync, mkdirSync, writeFileSync, unlinkSync } from 'node:fs';
 import { dirname, isAbsolute, join, relative, resolve } from 'node:path';
 import { BeastLogStore } from '../events/beast-log-store.js';
 import type { BeastEventBus } from '../events/beast-event-bus.js';
@@ -11,6 +11,8 @@ import type { BeastDefinition, BeastProcessSpec, BeastRun, BeastRunAttempt, Beas
 const STDERR_BUFFER_SIZE = 50;
 const REDACTED_SECRET = '[REDACTED]';
 const MIN_CONFIGURED_SECRET_LENGTH = 6;
+const RUN_CONFIG_DIR_MODE = 0o700;
+const RUN_CONFIG_FILE_MODE = 0o600;
 
 const SENSITIVE_CONFIG_KEY_PATTERN = /(?:password|passwd|pwd|secret|clientsecret|token|apikey|accesskey|privatekey|auth|credential|webhookurl)/i;
 
@@ -214,9 +216,11 @@ export class ProcessBeastExecutor implements BeastExecutor {
       this.options.runConfigDir ??
       join(isolatedSpec.cwd ?? process.env.FBEAST_ROOT ?? process.cwd(), '.fbeast', '.build', 'run-configs'),
     );
-    mkdirSync(configDir, { recursive: true });
+    mkdirSync(configDir, { recursive: true, mode: RUN_CONFIG_DIR_MODE });
+    chmodSync(configDir, RUN_CONFIG_DIR_MODE);
     const configFilePath = join(configDir, `${run.id}.json`);
-    writeFileSync(configFilePath, JSON.stringify(isolatedConfigSnapshot, null, 2));
+    writeFileSync(configFilePath, JSON.stringify(isolatedConfigSnapshot, null, 2), { mode: RUN_CONFIG_FILE_MODE });
+    chmodSync(configFilePath, RUN_CONFIG_FILE_MODE);
     this.configFilePaths.set(run.id, configFilePath);
 
     const mergedSpec = {
