@@ -1,5 +1,5 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
-import { join } from 'node:path';
+import { isAbsolute, join, relative } from 'node:path';
 import { contentHashMatches } from '../utils/crypto.js';
 import { hashContent } from './replay-record.js';
 
@@ -36,6 +36,13 @@ export class ReplayContentStore {
     if (!SHA256_HEX_REF.test(ref)) {
       throw new Error('Replay content ref must be exactly 64 lowercase sha256 hex characters');
     }
-    return join(this.dir, ref);
+
+    const path = join(this.dir, ref);
+    const rel = relative(this.dir, path);
+    if (rel === '' || rel.startsWith('..') || isAbsolute(rel)) {
+      throw new Error('Replay content ref resolved path must stay within blob directory');
+    }
+
+    return path;
   }
 }
