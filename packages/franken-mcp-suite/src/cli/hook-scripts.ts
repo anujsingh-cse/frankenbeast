@@ -6,6 +6,10 @@
 import { mkdirSync, writeFileSync, chmodSync } from 'node:fs';
 import { join } from 'node:path';
 
+function shellSingleQuote(value: string): string {
+  return `'${value.split(`'`).join(`'\\''`)}'`;
+}
+
 export interface HookScriptPaths {
   preTool: string;
   postTool: string;
@@ -50,7 +54,7 @@ if [ "\${FRANKENBEAST_SPAWNED:-}" = "1" ] || [ "\${FBEAST_DISABLE_HOOKS:-}" = "1
   exit 0
 fi
 
-DB_PATH=${JSON.stringify(dbPath)}
+DB_PATH=${shellSingleQuote(dbPath)}
 HOOK_TIMEOUT_SECONDS="\${FBEAST_HOOK_TIMEOUT_SECONDS:-2}"
 
 INPUT=$(cat)
@@ -102,7 +106,7 @@ if [ "\${FRANKENBEAST_SPAWNED:-}" = "1" ] || [ "\${FBEAST_DISABLE_HOOKS:-}" = "1
   exit 0
 fi
 
-DB_PATH=${JSON.stringify(dbPath)}
+DB_PATH=${shellSingleQuote(dbPath)}
 HOOK_TIMEOUT_SECONDS="\${FBEAST_HOOK_TIMEOUT_SECONDS:-2}"
 
 INPUT_FILE=$(python3 -c "import tempfile; f=tempfile.NamedTemporaryFile(prefix='fbeast-hook-input.', delete=False); print(f.name); f.close()") || exit 0
@@ -146,7 +150,7 @@ if [ "\${FRANKENBEAST_SPAWNED:-}" = "1" ] || [ "\${FBEAST_DISABLE_HOOKS:-}" = "1
   exit 0
 fi
 
-DB_PATH=${JSON.stringify(dbPath)}
+DB_PATH=${shellSingleQuote(dbPath)}
 HOOK_TIMEOUT_SECONDS="\${FBEAST_HOOK_TIMEOUT_SECONDS:-2}"
 
 INPUT=$(cat)
@@ -197,7 +201,7 @@ if [ "\${FRANKENBEAST_SPAWNED:-}" = "1" ] || [ "\${FBEAST_DISABLE_HOOKS:-}" = "1
   exit 0
 fi
 
-DB_PATH=${JSON.stringify(dbPath)}
+DB_PATH=${shellSingleQuote(dbPath)}
 HOOK_TIMEOUT_SECONDS="\${FBEAST_HOOK_TIMEOUT_SECONDS:-2}"
 
 INPUT_FILE=$(python3 -c "import tempfile; f=tempfile.NamedTemporaryFile(prefix='fbeast-hook-input.', delete=False); print(f.name); f.close()") || exit 0
@@ -241,7 +245,7 @@ if [ "\${FRANKENBEAST_SPAWNED:-}" = "1" ] || [ "\${FBEAST_DISABLE_HOOKS:-}" = "1
   exit 0
 fi
 
-DB_PATH=${JSON.stringify(dbPath)}
+DB_PATH=${shellSingleQuote(dbPath)}
 HOOK_TIMEOUT_SECONDS="\${FBEAST_HOOK_TIMEOUT_SECONDS:-2}"
 
 INPUT=$(cat)
@@ -293,7 +297,7 @@ if [ "\${FRANKENBEAST_SPAWNED:-}" = "1" ] || [ "\${FBEAST_DISABLE_HOOKS:-}" = "1
   exit 0
 fi
 
-DB_PATH=${JSON.stringify(dbPath)}
+DB_PATH=${shellSingleQuote(dbPath)}
 HOOK_TIMEOUT_SECONDS="\${FBEAST_HOOK_TIMEOUT_SECONDS:-2}"
 
 INPUT_FILE=$(python3 -c "import tempfile; f=tempfile.NamedTemporaryFile(prefix='fbeast-hook-input.', delete=False); print(f.name); f.close()") || exit 0
