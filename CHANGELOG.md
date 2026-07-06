@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.42.1](https://github.com/djm204/frankenbeast/compare/v0.42.0...v0.42.1) (2026-07-06)
+
+
+### Bug Fixes
+
+* **compose:** pin local observability images ([0dd9c16](https://github.com/djm204/frankenbeast/commit/0dd9c1626c623abca1820ea79d0cd885de7e2290)), closes [#754](https://github.com/djm204/frankenbeast/issues/754)
+* **orchestrator:** log pr creator fallback errors ([#840](https://github.com/djm204/frankenbeast/issues/840)) ([e49fa8d](https://github.com/djm204/frankenbeast/commit/e49fa8dc89bac80440cf2aee3bd42407b6db2cb7))
+* **orchestrator:** make sharp optional so the published CLI runs without it ([#854](https://github.com/djm204/frankenbeast/issues/854)) ([ff86b4a](https://github.com/djm204/frankenbeast/commit/ff86b4a0ef536b08791b55bc846bdeeeb7a0f970))
+* **orchestrator:** release supervisor exit on inherited stdio ([#876](https://github.com/djm204/frankenbeast/issues/876)) ([5bc0134](https://github.com/djm204/frankenbeast/commit/5bc0134986365b378f8f03ccd3752c79442e7696))
+* **orchestrator:** support init backend flag ([#869](https://github.com/djm204/frankenbeast/issues/869)) ([e9ea2bc](https://github.com/djm204/frankenbeast/commit/e9ea2bc263556ab757031de39bbff5ccd7e05d79))
+
+
+### Refactoring
+
+* **tests:** alias Vitest configs to package sources ([#845](https://github.com/djm204/frankenbeast/issues/845)) ([454b526](https://github.com/djm204/frankenbeast/commit/454b526e509d5762bde3ec5102d7521367f0c1a7))
+* **tests:** remove recursive Turbo verification ([#878](https://github.com/djm204/frankenbeast/issues/878)) ([cbfa80b](https://github.com/djm204/frankenbeast/commit/cbfa80bb515030c296f1ff1b1b9a13e5f39a53eb))
+
+
+### CI/CD
+
+* add daily deterministic security scan (semgrep + gitleaks + npm audit) ([#826](https://github.com/djm204/frankenbeast/issues/826)) ([e868142](https://github.com/djm204/frankenbeast/commit/e8681424f5dfa121ec94d2ff519d7551c9050f62))
+* add publish-smoke + workspace-dep guards to lock the boundary ([#860](https://github.com/djm204/frankenbeast/issues/860)) ([1e64b6f](https://github.com/djm204/frankenbeast/commit/1e64b6f65852302f416fac864748a47636c4f21a))
+
+
+### Tests
+
+* externalize credential fixtures ([#910](https://github.com/djm204/frankenbeast/issues/910)) ([84ff583](https://github.com/djm204/frankenbeast/commit/84ff5830a23095a32339a1970a3e2d6d0a443dca)), closes [#519](https://github.com/djm204/frankenbeast/issues/519)
+
 ## [0.42.0](https://github.com/djm204/frankenbeast/compare/v0.41.1...v0.42.0) (2026-07-06)
 
 

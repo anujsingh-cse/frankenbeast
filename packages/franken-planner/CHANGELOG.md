@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.4.10](https://github.com/djm204/frankenbeast/compare/@franken/planner-v0.4.9...@franken/planner-v0.4.10) (2026-07-06)
+
+
+### Bug Fixes
+
+* **planner:** detect cycles in parallel planner ([b6102c3](https://github.com/djm204/frankenbeast/commit/b6102c3f6fc1f2c12e35599ac2fc6e83929e8cf0)), closes [#687](https://github.com/djm204/frankenbeast/issues/687)
+* **planner:** reject dangling raw DAG edges ([fcb271d](https://github.com/djm204/frankenbeast/commit/fcb271d444ed439baa32533cc6faa44e9d7a6260)), closes [#847](https://github.com/djm204/frankenbeast/issues/847)
+* **publish:** add files allowlist to governor/planner/types so dist actually ships ([#844](https://github.com/djm204/frankenbeast/issues/844)) ([46cb1a1](https://github.com/djm204/frankenbeast/commit/46cb1a1f1517da3cf88d589894fdc30b863b8e99))
+
+
+### Refactoring
+
+* **tests:** alias Vitest configs to package sources ([#845](https://github.com/djm204/frankenbeast/issues/845)) ([454b526](https://github.com/djm204/frankenbeast/commit/454b526e509d5762bde3ec5102d7521367f0c1a7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @franken/types bumped from 0.7.6 to 0.7.7
+
 ## [0.4.9](https://github.com/djm204/frankenbeast/compare/@franken/planner-v0.4.8...@franken/planner-v0.4.9) (2026-07-06)
 
 

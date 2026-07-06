@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.7.1](https://github.com/djm204/frankenbeast/compare/@franken/brain-v0.7.0...@franken/brain-v0.7.1) (2026-07-06)
+
+
+### Refactoring
+
+* **tests:** alias Vitest configs to package sources ([#845](https://github.com/djm204/frankenbeast/issues/845)) ([454b526](https://github.com/djm204/frankenbeast/commit/454b526e509d5762bde3ec5102d7521367f0c1a7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @franken/types bumped from 0.7.6 to 0.7.7
+
 ## [0.7.0](https://github.com/djm204/frankenbeast/compare/@franken/brain-v0.6.6...@franken/brain-v0.7.0) (2026-07-06)
 
 

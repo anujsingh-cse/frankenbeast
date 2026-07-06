@@ -1,5 +1,26 @@
 # Changelog
 
+## [0.2.2](https://github.com/djm204/frankenbeast/compare/franken-web-v0.2.1...franken-web-v0.2.2) (2026-07-06)
+
+
+### Bug Fixes
+
+* **web:** label skill catalog search field ([#846](https://github.com/djm204/frankenbeast/issues/846)) ([87e4295](https://github.com/djm204/frankenbeast/commit/87e42952f5554ff15b7560b88d622904e25b2227))
+* **web:** show analytics JSON copy feedback ([edae673](https://github.com/djm204/frankenbeast/commit/edae6733d200897c23bfc5d76a4822f400376317)), closes [#633](https://github.com/djm204/frankenbeast/issues/633)
+* **web:** use active route as page heading ([4392947](https://github.com/djm204/frankenbeast/commit/4392947c4fc89a32682ce8d934d520c90096693f))
+
+
+### Refactoring
+
+* **tests:** alias Vitest configs to package sources ([#845](https://github.com/djm204/frankenbeast/issues/845)) ([454b526](https://github.com/djm204/frankenbeast/commit/454b526e509d5762bde3ec5102d7521367f0c1a7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @franken/types bumped from 0.7.6 to 0.7.7
+
 ## [0.2.1](https://github.com/djm204/frankenbeast/compare/franken-web-v0.2.0...franken-web-v0.2.1) (2026-07-06)
 
 

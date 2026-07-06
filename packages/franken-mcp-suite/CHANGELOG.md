@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.2.2](https://github.com/djm204/frankenbeast/compare/franken-mcp-suite-v0.2.1...franken-mcp-suite-v0.2.2) (2026-07-06)
+
+
+### Bug Fixes
+
+* **governor:** tighten dangerous pattern matching ([#879](https://github.com/djm204/frankenbeast/issues/879)) ([7cf183d](https://github.com/djm204/frankenbeast/commit/7cf183d5ca672a94e0875a843bdf0c433891e697))
+* **mcp-suite:** tolerate commented settings writes ([#881](https://github.com/djm204/frankenbeast/issues/881)) ([4a9ab8c](https://github.com/djm204/frankenbeast/commit/4a9ab8c949bb5d20a975d0135c16ea244aa2b132))
+* **mcp:** stream hook audit payloads via stdin ([1814b48](https://github.com/djm204/frankenbeast/commit/1814b48efc9c77fed4f4add60d9f426beb5c21a7))
+* **mcp:** validate beast provider values ([813561e](https://github.com/djm204/frankenbeast/commit/813561ed1e888848ca0e075b7f99c46f0471cd38)), closes [#420](https://github.com/djm204/frankenbeast/issues/420)
+
+
+### Refactoring
+
+* **tests:** alias Vitest configs to package sources ([#845](https://github.com/djm204/frankenbeast/issues/845)) ([454b526](https://github.com/djm204/frankenbeast/commit/454b526e509d5762bde3ec5102d7521367f0c1a7))
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @franken/types bumped from 0.7.6 to 0.7.7
+    * @franken/brain bumped from 0.7.0 to 0.7.1
+    * @franken/critique bumped from 0.6.11 to 0.6.12
+    * @franken/governor bumped from 0.5.9 to 0.5.10
+    * @franken/observer bumped from 0.7.11 to 0.7.12
+    * @franken/orchestrator bumped from 0.40.0 to 0.40.1
+    * @franken/planner bumped from 0.4.9 to 0.4.10
+
 ## [0.2.1](https://github.com/djm204/frankenbeast/compare/franken-mcp-suite-v0.2.0...franken-mcp-suite-v0.2.1) (2026-07-06)
 
 

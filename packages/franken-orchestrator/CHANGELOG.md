@@ -1,5 +1,46 @@
 # Changelog
 
+## [0.40.1](https://github.com/djm204/frankenbeast/compare/@franken/orchestrator-v0.40.0...@franken/orchestrator-v0.40.1) (2026-07-06)
+
+
+### Bug Fixes
+
+* **cli:** print PR URL in run summary ([#894](https://github.com/djm204/frankenbeast/issues/894)) ([ae83ce5](https://github.com/djm204/frankenbeast/commit/ae83ce5985687aa81bdfc7ce65505e33974e10f1))
+* **orchestrator:** bound CLI rate-limit retries ([#911](https://github.com/djm204/frankenbeast/issues/911)) ([c6f8c39](https://github.com/djm204/frankenbeast/commit/c6f8c3938185fb1f68b2a71086f72bbaf4fa0e17))
+* **orchestrator:** clean up chat websocket listeners ([e9ccd1a](https://github.com/djm204/frankenbeast/commit/e9ccd1a1a8e6a97eb098eff91f122338deddfdd1)), closes [#690](https://github.com/djm204/frankenbeast/issues/690)
+* **orchestrator:** handle child process spawn errors ([8767f8f](https://github.com/djm204/frankenbeast/commit/8767f8fcc68531f8feb0fd0b263229e385d2c081))
+* **orchestrator:** log pr creator fallback errors ([#840](https://github.com/djm204/frankenbeast/issues/840)) ([e49fa8d](https://github.com/djm204/frankenbeast/commit/e49fa8dc89bac80440cf2aee3bd42407b6db2cb7))
+* **orchestrator:** make sharp optional so the published CLI runs without it ([#854](https://github.com/djm204/frankenbeast/issues/854)) ([ff86b4a](https://github.com/djm204/frankenbeast/commit/ff86b4a0ef536b08791b55bc846bdeeeb7a0f970))
+* **orchestrator:** release supervisor exit on inherited stdio ([#876](https://github.com/djm204/frankenbeast/issues/876)) ([5bc0134](https://github.com/djm204/frankenbeast/commit/5bc0134986365b378f8f03ccd3752c79442e7696))
+* **orchestrator:** remove unsafe type-safety bypasses ([95641cb](https://github.com/djm204/frankenbeast/commit/95641cbbdbd8e2a7e575460cd920158cfd510bad)), closes [#639](https://github.com/djm204/frankenbeast/issues/639)
+* **orchestrator:** return bad request for invalid webhook payloads ([#868](https://github.com/djm204/frankenbeast/issues/868)) ([908621c](https://github.com/djm204/frankenbeast/commit/908621c3ae65b3f16848f8ce7c4bea4ee08e52a6))
+* **orchestrator:** support init backend flag ([#869](https://github.com/djm204/frankenbeast/issues/869)) ([e9ea2bc](https://github.com/djm204/frankenbeast/commit/e9ea2bc263556ab757031de39bbff5ccd7e05d79))
+* **orchestrator:** ticket-authenticate chat SSE streams ([#867](https://github.com/djm204/frankenbeast/issues/867)) ([bf2d315](https://github.com/djm204/frankenbeast/commit/bf2d315f1fcdb5c278ad6d3ffa16e6149df73146))
+* **orchestrator:** validate skill MCP config writes ([#866](https://github.com/djm204/frankenbeast/issues/866)) ([8a97c2a](https://github.com/djm204/frankenbeast/commit/8a97c2abc88c2e0842f0b76e7c10e71ed95d64a8)), closes [#682](https://github.com/djm204/frankenbeast/issues/682)
+* **web:** require explicit chat socket token TTL ([#892](https://github.com/djm204/frankenbeast/issues/892)) ([5065ddf](https://github.com/djm204/frankenbeast/commit/5065ddf1bc5340208433eebbcf7cfa19dce9fb68))
+
+
+### Refactoring
+
+* **tests:** alias Vitest configs to package sources ([#845](https://github.com/djm204/frankenbeast/issues/845)) ([454b526](https://github.com/djm204/frankenbeast/commit/454b526e509d5762bde3ec5102d7521367f0c1a7))
+
+
+### Tests
+
+* externalize credential fixtures ([#910](https://github.com/djm204/frankenbeast/issues/910)) ([84ff583](https://github.com/djm204/frankenbeast/commit/84ff5830a23095a32339a1970a3e2d6d0a443dca)), closes [#519](https://github.com/djm204/frankenbeast/issues/519)
+
+
+### Dependencies
+
+* The following workspace dependencies were updated
+  * dependencies
+    * @franken/critique bumped from 0.6.11 to 0.6.12
+    * @franken/governor bumped from 0.5.9 to 0.5.10
+    * @franken/types bumped from 0.7.6 to 0.7.7
+    * @franken/observer bumped from 0.7.11 to 0.7.12
+    * @franken/planner bumped from 0.4.9 to 0.4.10
+    * @franken/brain bumped from 0.7.0 to 0.7.1
+
 ## [0.40.0](https://github.com/djm204/frankenbeast/compare/@franken/orchestrator-v0.39.1...@franken/orchestrator-v0.40.0) (2026-07-06)
 
 

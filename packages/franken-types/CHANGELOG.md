@@ -1,5 +1,17 @@
 # Changelog
 
+## [0.7.7](https://github.com/djm204/frankenbeast/compare/franken-types-v0.7.6...franken-types-v0.7.7) (2026-07-06)
+
+
+### Bug Fixes
+
+* **publish:** add files allowlist to governor/planner/types so dist actually ships ([#844](https://github.com/djm204/frankenbeast/issues/844)) ([46cb1a1](https://github.com/djm204/frankenbeast/commit/46cb1a1f1517da3cf88d589894fdc30b863b8e99))
+
+
+### Refactoring
+
+* **tests:** alias Vitest configs to package sources ([#845](https://github.com/djm204/frankenbeast/issues/845)) ([454b526](https://github.com/djm204/frankenbeast/commit/454b526e509d5762bde3ec5102d7521367f0c1a7))
+
 ## [0.7.6](https://github.com/djm204/frankenbeast/compare/franken-types-v0.7.5...franken-types-v0.7.6) (2026-07-06)
 
 
