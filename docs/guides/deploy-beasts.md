@@ -25,7 +25,7 @@ Use the operator token already configured for the repo, or update the configured
 For a new local-only setup without a stored token, set one shell variable and reuse it for both processes:
 
 ```bash
-export OPERATOR_TOKEN='dev-operator-token'
+export OPERATOR_TOKEN="$FRANKENBEAST_BEAST_OPERATOR_TOKEN"
 export FRANKENBEAST_BEAST_OPERATOR_TOKEN="$OPERATOR_TOKEN"
 ```
 
