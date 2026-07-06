@@ -1,4 +1,5 @@
 import { spawn } from 'node:child_process';
+import { basename } from 'node:path';
 import { open } from 'node:fs/promises';
 import { Socket } from 'node:net';
 import type { ManagedNetworkServiceState } from './network-state-store.js';
@@ -7,6 +8,41 @@ import type { PreflightServiceResult, StartServiceOptions } from './network-supe
 
 const PORT_CHECK_TIMEOUT_MS = 300;
 const HTTP_CHECK_TIMEOUT_MS = 1_000;
+const SAFE_PROCESS_VALUE_RE = /^[^\x00-\x1f\x7f]*$/;
+
+const ALLOWED_NETWORK_SERVICE_COMMANDS: Partial<Record<ResolvedNetworkService['id'], readonly string[]>> = {
+  'beasts-daemon': ['npm', 'npm.cmd'],
+  'chat-server': ['npm', 'npm.cmd'],
+  'dashboard-web': ['node', 'node.exe'],
+};
+
+function assertSafeProcessValue(serviceId: string, field: string, value: string): void {
+  if (!SAFE_PROCESS_VALUE_RE.test(value)) {
+    throw new Error(`Unsafe network service ${field} for ${serviceId}`);
+  }
+}
+
+function validateNetworkProcessSpec(service: ResolvedNetworkService): void {
+  const processSpec = service.runtimeConfig.process;
+  if (!processSpec) {
+    return;
+  }
+
+  const commandName = basename(processSpec.command);
+  const allowedCommands = ALLOWED_NETWORK_SERVICE_COMMANDS[service.id] ?? [];
+  if (!allowedCommands.includes(commandName)) {
+    throw new Error(`Unsafe network service command for ${service.id}: ${processSpec.command}`);
+  }
+
+  for (const arg of processSpec.args) {
+    assertSafeProcessValue(service.id, 'argument', arg);
+  }
+  assertSafeProcessValue(service.id, 'working directory', processSpec.cwd);
+  for (const [key, value] of Object.entries(processSpec.env ?? {})) {
+    assertSafeProcessValue(service.id, `environment key ${key}`, key);
+    assertSafeProcessValue(service.id, `environment value ${key}`, value);
+  }
+}
 
 export async function startNetworkService(
   service: ResolvedNetworkService,
@@ -16,6 +52,7 @@ export async function startNetworkService(
   if (!processSpec) {
     throw new Error(`Service ${service.id} does not have a runnable entrypoint yet`);
   }
+  validateNetworkProcessSpec(service);
 
   if (options.detached) {
     const handle = await open(options.logFile ?? '/dev/null', 'a');

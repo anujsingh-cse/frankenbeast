@@ -2,7 +2,10 @@ import { afterAll, afterEach, describe, expect, it, vi } from 'vitest';
 import { startNetworkService, stopNetworkService } from '../../../src/network/network-supervisor-runtime.js';
 import type { ResolvedNetworkService } from '../../../src/network/network-registry.js';
 
-function makeService(command: string): ResolvedNetworkService {
+function makeService(
+  command: string,
+  overrides: Partial<ResolvedNetworkService['runtimeConfig']['process']> = {},
+): ResolvedNetworkService {
   return {
     id: 'chat-server',
     displayName: 'Chat Server',
@@ -18,6 +21,7 @@ function makeService(command: string): ResolvedNetworkService {
         command,
         args: [],
         cwd: process.cwd(),
+        ...overrides,
       },
     },
   };
@@ -30,18 +34,34 @@ describe('startNetworkService', () => {
     errorSpy.mockClear();
   });
 
+  it('rejects service commands outside the registry allowlist before spawning', async () => {
+    await expect(startNetworkService(makeService('sh'), {
+      detached: false,
+    })).rejects.toThrow('Unsafe network service command for chat-server: sh');
+
+    expect(errorSpy).not.toHaveBeenCalledWith(expect.stringContaining('Process spawn failed'));
+  });
+
+  it('rejects control characters in configured service arguments before spawning', async () => {
+    await expect(startNetworkService(makeService('npm', {
+      args: ['run', 'chat-server', 'bad\n--extra-flag'],
+    }), {
+      detached: false,
+    })).rejects.toThrow('Unsafe network service argument for chat-server');
+
+    expect(errorSpy).not.toHaveBeenCalledWith(expect.stringContaining('Process spawn failed'));
+  });
+
   afterAll(() => {
     errorSpy.mockRestore();
   });
 
-  it('handles child process error events for missing foreground services without crashing', async () => {
+  it('rejects absolute service commands not owned by the network registry before spawning', async () => {
     await expect(startNetworkService(makeService('/definitely/not-a-real-command-franken-698'), {
       detached: false,
-    })).rejects.toThrow(/Failed to start service chat-server/);
+    })).rejects.toThrow('Unsafe network service command for chat-server');
 
-    await vi.waitFor(() => {
-      expect(errorSpy).toHaveBeenCalledWith(expect.stringContaining('Process spawn failed'));
-    }, { timeout: 5000 });
+    expect(errorSpy).not.toHaveBeenCalledWith(expect.stringContaining('Process spawn failed'));
   });
 });
 
