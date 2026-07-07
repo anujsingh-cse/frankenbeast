@@ -219,6 +219,9 @@ export class ProcessBeastExecutor implements BeastExecutor {
     mkdirSync(configDir, { recursive: true, mode: RUN_CONFIG_DIR_MODE });
     chmodSync(configDir, RUN_CONFIG_DIR_MODE);
     const configFilePath = join(configDir, `${run.id}.json`);
+    if (existsSync(configFilePath)) {
+      unlinkSync(configFilePath);
+    }
     writeFileSync(configFilePath, JSON.stringify(isolatedConfigSnapshot, null, 2), { mode: RUN_CONFIG_FILE_MODE });
     chmodSync(configFilePath, RUN_CONFIG_FILE_MODE);
     this.configFilePaths.set(run.id, configFilePath);
