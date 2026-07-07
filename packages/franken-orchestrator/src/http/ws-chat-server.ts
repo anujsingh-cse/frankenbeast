@@ -2,11 +2,13 @@ import type { IncomingMessage, Server as HttpServer } from 'node:http';
 import { randomUUID } from 'node:crypto';
 import type { Duplex } from 'node:stream';
 import { WebSocketServer, type WebSocket } from 'ws';
+import { approvalRuntimeInput } from '../chat/approval-input.js';
 import { ChatRuntime } from '../chat/runtime.js';
 import type { ISessionStore } from '../chat/session-store.js';
 import type { ChatSession } from '../chat/types.js';
 import type { TurnEvent } from '../chat/turn-runner.js';
 import {
+  ChatSocketSessionTicketStore,
   verifyChatSocketRequest,
 } from './ws-chat-auth.js';
 import {
@@ -28,6 +30,7 @@ export interface ChatSocketControllerOptions {
   allowedOrigins?: string[];
   runtime: ChatRuntime;
   sessionStore: ISessionStore;
+  ticketStore?: ChatSocketSessionTicketStore;
   tokenSecret: string;
 }
 
@@ -94,16 +97,18 @@ export class ChatSocketController {
   private readonly allowedOrigins: string[];
   private readonly runtime: ChatRuntime;
   private readonly sessionStore: ISessionStore;
+  private readonly ticketStore: ChatSocketSessionTicketStore;
   private readonly tokenSecret: string;
 
   constructor(options: ChatSocketControllerOptions) {
     this.allowedOrigins = options.allowedOrigins ?? [];
     this.runtime = options.runtime;
     this.sessionStore = options.sessionStore;
+    this.ticketStore = options.ticketStore ?? new ChatSocketSessionTicketStore();
     this.tokenSecret = options.tokenSecret;
   }
 
-  connect(peer: ChatSocketPeer, request: ChatSocketConnectRequest): { ok: true } | { ok: false; status: number } {
+  authorize(request: ChatSocketConnectRequest): { ok: true } | { ok: false; status: number } {
     const session = this.sessionStore.get(request.sessionId);
     if (!session) {
       return { ok: false, status: 404 };
@@ -120,6 +125,30 @@ export class ChatSocketController {
       return auth;
     }
 
+    if (request.token && this.ticketStore.isConsumed(request.token)) {
+      this.auditRejectedTicketReuse(request.sessionId);
+      return { ok: false, status: 401 };
+    }
+
+    return { ok: true };
+  }
+
+  connect(peer: ChatSocketPeer, request: ChatSocketConnectRequest): { ok: true } | { ok: false; status: number } {
+    const auth = this.authorize(request);
+    if (!auth.ok) {
+      return auth;
+    }
+
+    if (!request.token || !this.ticketStore.consume(request.token)) {
+      this.auditRejectedTicketReuse(request.sessionId);
+      return { ok: false, status: 401 };
+    }
+
+    const session = this.sessionStore.get(request.sessionId);
+    if (!session) {
+      return { ok: false, status: 404 };
+    }
+
     createPeerState(peer, request.sessionId, this);
     this.emit(peer, {
       type: 'session.ready',
@@ -130,6 +159,10 @@ export class ChatSocketController {
       pendingApproval: session.pendingApproval ?? null,
     });
     return { ok: true };
+  }
+
+  private auditRejectedTicketReuse(sessionId: string): void {
+    console.warn('Rejected reused websocket chat session ticket', { sessionId });
   }
 
   disconnect(peer: ChatSocketPeer): void {
@@ -313,16 +346,20 @@ export class ChatSocketController {
       return;
     }
 
-    const result = await this.runtime.run('/approve', {
-      sessionId: session.id,
-      pendingApproval: Boolean(session.pendingApproval),
-      projectId: session.projectId,
-      transcript: session.transcript,
-      ...(session.beastContext !== undefined ? { beastContext: session.beastContext } : {}),
-    });
+    if (!session.pendingApproval && session.state !== 'pending_approval') {
+      this.emit(peer, {
+        type: 'turn.approval.resolved',
+        approved: session.state !== 'rejected',
+        timestamp: nowIso(),
+      });
+      return;
+    }
+
+    const pendingApproval = session.pendingApproval ?? null;
+    const originalState = session.state;
+    const runtimeInput = approvalRuntimeInput(pendingApproval);
     session.pendingApproval = null;
-    session.state = result.state;
-    session.beastContext = result.beastContext ?? null;
+    session.state = 'approved';
     session.updatedAt = nowIso();
     this.sessionStore.save(session);
 
@@ -331,6 +368,56 @@ export class ChatSocketController {
       approved: true,
       timestamp: session.updatedAt,
     });
+
+    let result: Awaited<ReturnType<ChatRuntime['run']>>;
+    try {
+      result = await this.runtime.run(runtimeInput, {
+        sessionId: session.id,
+        pendingApproval: Boolean(pendingApproval) || originalState === 'pending_approval',
+        projectId: session.projectId,
+        transcript: session.transcript,
+        ...(session.beastContext !== undefined ? { beastContext: session.beastContext } : {}),
+      }, {
+        onEvent: (event) => {
+          try {
+            this.emit(peer, mapTurnEvent(event));
+          } catch {
+            // Socket delivery is best-effort; do not turn an already-running
+            // approved command into a retryable approval execution failure.
+          }
+        },
+      });
+    } catch (error) {
+      session.pendingApproval = pendingApproval;
+      session.state = originalState;
+      session.updatedAt = nowIso();
+      this.sessionStore.save(session);
+      this.emit(peer, {
+        type: 'turn.error',
+        code: 'APPROVAL_EXECUTION_FAILED',
+        message: error instanceof Error ? error.message : 'Approved action failed to run.',
+        timestamp: session.updatedAt,
+      });
+      if (pendingApproval) {
+        this.emit(peer, {
+          type: 'turn.approval.requested',
+          description: pendingApproval.description,
+          timestamp: pendingApproval.requestedAt,
+          ...(pendingApproval.tool ? { tool: pendingApproval.tool } : {}),
+          ...(pendingApproval.command ? { command: pendingApproval.command } : {}),
+          ...(pendingApproval.risk ? { risk: pendingApproval.risk } : {}),
+          ...(pendingApproval.affectedFiles ? { affectedFiles: pendingApproval.affectedFiles } : {}),
+          ...(pendingApproval.sessionId ? { sessionId: pendingApproval.sessionId } : {}),
+        });
+      }
+      return;
+    }
+    session.pendingApproval = null;
+    session.state = result.state === 'active' ? 'approved' : result.state;
+    session.beastContext = result.beastContext ?? null;
+    session.updatedAt = nowIso();
+    this.sessionStore.save(session);
+
     for (const display of result.displayMessages) {
       this.emit(peer, {
         type: 'assistant.message.complete',
@@ -403,25 +490,15 @@ export function attachChatWebSocketServer(options: AttachChatWebSocketServerOpti
     }
     const { token } = protocolAuth;
 
-    const auth = controller.connect(
-      {
-        close: () => socket.destroy(),
-        send: () => undefined,
-      },
-      {
-        origin: requestOrigin(request),
-        sessionId,
-        token,
-      },
-    );
+    const auth = controller.authorize({
+      origin: requestOrigin(request),
+      sessionId,
+      token,
+    });
     if (!auth.ok) {
       closeUnauthorized(socket, auth.status);
       return;
     }
-    controller.disconnect({
-      close: () => socket.destroy(),
-      send: () => undefined,
-    });
     request.headers['sec-websocket-protocol'] = CHAT_SOCKET_PROTOCOL;
 
     server.handleUpgrade(request, socket, head, (ws: WebSocket) => {

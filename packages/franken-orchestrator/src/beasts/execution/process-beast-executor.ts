@@ -4,7 +4,12 @@ import { BeastLogStore } from '../events/beast-log-store.js';
 import type { BeastEventBus } from '../events/beast-event-bus.js';
 import { SQLiteBeastRepository } from '../repository/sqlite-beast-repository.js';
 import type { BeastExecutor, StopOptions } from './beast-executor.js';
-import { createBeastWorktree, removeBeastWorktree, type GitWorktreeIsolationConfig } from './git-worktree-isolation.js';
+import {
+  createBeastWorktree,
+  removeBeastWorktree,
+  type BeastWorktreeAllocation,
+  type GitWorktreeIsolationConfig,
+} from './git-worktree-isolation.js';
 import type { ProcessSupervisorLike } from './process-supervisor.js';
 import type { BeastDefinition, BeastProcessSpec, BeastRun, BeastRunAttempt, BeastRunStatus, ModuleConfig } from '../types.js';
 
@@ -175,7 +180,9 @@ export interface ProcessBeastExecutorOptions {
 export class ProcessBeastExecutor implements BeastExecutor {
   private readonly exitPromises = new Map<string, { resolve: () => void }>();
   private readonly stoppingAttempts = new Set<string>();
-  private readonly configFilePaths = new Map<string, string>();
+  private readonly pendingConfigFilePaths = new Map<string, string>();
+  private readonly attemptConfigFilePaths = new Map<string, string>();
+  private readonly worktreeAllocations = new Map<string, BeastWorktreeAllocation>();
 
   constructor(
     private readonly repository: SQLiteBeastRepository,
@@ -195,6 +202,9 @@ export class ProcessBeastExecutor implements BeastExecutor {
           processSpec.cwd,
         )
       : undefined;
+    if (worktree) {
+      this.worktreeAllocations.set(run.id, worktree);
+    }
     const isolatedConfigSnapshot = worktree
       ? remapRuntimeConfigSnapshot(run.configSnapshot, processSpec.cwd, worktree.executionCwd)
       : run.configSnapshot;
@@ -224,7 +234,7 @@ export class ProcessBeastExecutor implements BeastExecutor {
     }
     writeFileSync(configFilePath, JSON.stringify(isolatedConfigSnapshot, null, 2), { mode: RUN_CONFIG_FILE_MODE });
     chmodSync(configFilePath, RUN_CONFIG_FILE_MODE);
-    this.configFilePaths.set(run.id, configFilePath);
+    this.pendingConfigFilePaths.set(run.id, configFilePath);
 
     const mergedSpec = {
       ...isolatedSpec,
@@ -317,14 +327,7 @@ export class ProcessBeastExecutor implements BeastExecutor {
       });
 
       // Clean up config file and worktree allocation written before spawn
-      const configPath = this.configFilePaths.get(run.id);
-      if (configPath) {
-        try { unlinkSync(configPath); } catch { /* already removed */ }
-        this.configFilePaths.delete(run.id);
-      }
-      if (worktree?.created) {
-        try { removeBeastWorktree(worktree, this.options.worktreeIsolation?.runGit); } catch { /* best effort */ }
-      }
+      this.cleanupRunResources(run.id);
 
       this.options.eventBus?.publish({
         type: 'run.status',
@@ -357,6 +360,12 @@ export class ProcessBeastExecutor implements BeastExecutor {
           : {}),
       },
     });
+
+    // Once an attempt owns the worktree, preserve it for PR/merge or debugging per ADR-028.
+    // The pending allocation map is only for pre-attempt spawn failures.
+    this.worktreeAllocations.delete(run.id);
+    this.pendingConfigFilePaths.delete(run.id);
+    this.attemptConfigFilePaths.set(attempt.id, configFilePath);
 
     attemptId = attempt.id;
 
@@ -483,12 +492,8 @@ export class ProcessBeastExecutor implements BeastExecutor {
         this.exitPromises.delete(attemptId);
         exitEntry.resolve();
       }
-      // Still clean up config file
-      const configPath = this.configFilePaths.get(runId);
-      if (configPath) {
-        try { unlinkSync(configPath); } catch { /* already removed */ }
-        this.configFilePaths.delete(runId);
-      }
+      // Still clean up this attempt's config file; completed/failed worktrees are preserved for PRs/debugging.
+      this.cleanupAttemptConfig(attemptId);
       return;
     }
 
@@ -500,11 +505,7 @@ export class ProcessBeastExecutor implements BeastExecutor {
         this.exitPromises.delete(attemptId);
         exitEntry.resolve();
       }
-      const configPath = this.configFilePaths.get(runId);
-      if (configPath) {
-        try { unlinkSync(configPath); } catch { /* already removed */ }
-        this.configFilePaths.delete(runId);
-      }
+      this.cleanupAttemptConfig(attemptId);
       return;
     }
 
@@ -554,12 +555,7 @@ export class ProcessBeastExecutor implements BeastExecutor {
       exitEntry.resolve();
     }
 
-    // Clean up config file
-    const configPath = this.configFilePaths.get(runId);
-    if (configPath) {
-      try { unlinkSync(configPath); } catch { /* already removed */ }
-      this.configFilePaths.delete(runId);
-    }
+    this.cleanupAttemptConfig(attemptId);
 
     this.options.eventBus?.publish({
       type: 'run.status',
@@ -575,6 +571,36 @@ export class ProcessBeastExecutor implements BeastExecutor {
       throw new Error(`Unknown Beast attempt: ${attemptId}`);
     }
     return attempt;
+  }
+
+  private cleanupRunResources(runId: string): void {
+    this.cleanupPendingRunConfig(runId);
+
+    const worktree = this.worktreeAllocations.get(runId);
+    if (worktree) {
+      try {
+        if (worktree.created) {
+          removeBeastWorktree(worktree, this.options.worktreeIsolation?.runGit);
+        }
+      } catch { /* best effort */ }
+      finally { this.worktreeAllocations.delete(runId); }
+    }
+  }
+
+  private cleanupPendingRunConfig(runId: string): void {
+    const configPath = this.pendingConfigFilePaths.get(runId);
+    if (configPath) {
+      try { unlinkSync(configPath); } catch { /* already removed */ }
+      this.pendingConfigFilePaths.delete(runId);
+    }
+  }
+
+  private cleanupAttemptConfig(attemptId: string): void {
+    const configPath = this.attemptConfigFilePaths.get(attemptId);
+    if (configPath) {
+      try { unlinkSync(configPath); } catch { /* already removed */ }
+      this.attemptConfigFilePaths.delete(attemptId);
+    }
   }
 
   private finishAttempt(
@@ -610,6 +636,8 @@ export class ProcessBeastExecutor implements BeastExecutor {
       type: 'run.log',
       data: { runId, attemptId: attempt.id, stream: 'stderr', line: stopReason, createdAt: finishedAt },
     });
+
+    this.cleanupAttemptConfig(attempt.id);
 
     this.options.eventBus?.publish({
       type: 'run.status',
