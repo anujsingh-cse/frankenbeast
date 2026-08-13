@@ -1,7 +1,6 @@
 ---
 description: Code quality standards - SOLID, DRY, clean code practices, naming, error handling, immutability. Universal across languages and frameworks.
 alwaysApply: true
----
 
 # Code Quality Standards
 
@@ -52,3 +51,93 @@ alwaysApply: true
 - Only make changes directly requested or clearly necessary
 - Don't add features or abstractions beyond scope
 - Don't design for hypothetical future requirements
+
+// Utility functions
+function getSingleResponsibilityFunctionName(functionName: string): string {
+  return `${functionName}Function`;
+}
+
+function getOpenClosedFunctionName(functionName: string): string {
+  return `${functionName}WithExtension`;
+}
+
+function getLiskovSubstitutionFunctionName(functionName: string): string {
+  return `${functionName}Subtype`;
+}
+
+function getInterfaceSegregationFunctionName(functionName: string): string {
+  return `${functionName}Interface`;
+}
+
+function getDependencyInversionFunctionName(functionName: string): string {
+  return `${functionName}Dependency`;
+}
+
+// Function to check if a function is following SOLID principles
+function isSOLID(functionName: string, functionBody: string): boolean {
+  const singleResponsibility = functionBody.includes(getSingleResponsibilityFunctionName(functionName));
+  const openClosed = functionBody.includes(getOpenClosedFunctionName(functionName));
+  const liskovSubstitution = functionBody.includes(getLiskovSubstitutionFunctionName(functionName));
+  const interfaceSegregation = functionBody.includes(getInterfaceSegregationFunctionName(functionName));
+  const dependencyInversion = functionBody.includes(getDependencyInversionFunctionName(functionName));
+
+  return singleResponsibility && openClosed && liskovSubstitution && interfaceSegregation && dependencyInversion;
+}
+
+// Function to check if a function is following DRY principles
+function isDRY(functionName: string, functionBody: string): boolean {
+  const flagRepetition = functionBody.includes('if (') && functionBody.includes('else if (');
+  const oneSourceOfTruth = functionBody.includes('const truth = ');
+  const dontOverAbstract = functionBody.includes('if (') && functionBody.includes('else if (') && functionBody.includes('else (');
+
+  return flagRepetition && oneSourceOfTruth && dontOverAbstract;
+}
+
+// Function to check if a function is following clean code principles
+function isCleanCode(functionName: string, functionBody: string): boolean {
+  const smallFunctions = functionBody.length < 20;
+  const singlePurpose = functionBody.includes('return');
+  const noSideEffects = !functionBody.includes('this.');
+  const explicitOverClever = functionBody.includes('return') && functionBody.includes('if (');
+
+  return smallFunctions && singlePurpose && noSideEffects && explicitOverClever;
+}
+
+// Function to check if a function is following error handling principles
+function isErrorHandling(functionName: string, functionBody: string): boolean {
+  const neverSwallowErrors = functionBody.includes('throw new Error(');
+  const meaningfulErrorMessages = functionBody.includes('console.error(');
+  const failFast = functionBody.includes('return false;');
+  const handleErrorsAtAppropriateLevel = functionBody.includes('try {');
+
+  return neverSwallowErrors && meaningfulErrorMessages && failFast && handleErrorsAtAppropriateLevel;
+}
+
+// Function to check if a function is following immutability principles
+function isImmutability(functionName: string, functionBody: string): boolean {
+  const preferImmutableUpdates = functionBody.includes('{ ...user, name: newName }');
+  const preferPureFunctions = functionBody.includes('return { ...user, name: newName }');
+
+  return preferImmutableUpdates && preferPureFunctions;
+}
+
+// Function to check if a function is following "Engineered Enough" principles
+function isEngineeredEnough(functionName: string, functionBody: string): boolean {
+  const noHackyCode = !functionBody.includes('eval(');
+  const noFragileCode = !functionBody.includes('try {');
+  const noOverEngineeredCode = functionBody.length < 50;
+  const onlyMakeChangesDirectlyRequested = functionBody.includes('return');
+  const dontAddFeaturesOrAbstractionsBeyondScope = functionBody.includes('return') && functionBody.includes('if (');
+
+  return noHackyCode && noFragileCode && noOverEngineeredCode && onlyMakeChangesDirectlyRequested && dontAddFeaturesOrAbstractionsBeyondScope;
+}
+
+// Function to check if a function is following all code quality standards
+function isCodeQualityStandard(functionName: string, functionBody: string): boolean {
+  return isSOLID(functionName, functionBody) && isDRY(functionName, functionBody) && isCleanCode(functionName, functionBody) && isErrorHandling(functionName, functionBody) && isImmutability(functionName, functionBody) && isEngineeredEnough(functionName, functionBody);
+}
+
+// Export the function to check if a function is following all code quality standards
+export function isCodeQualityStandardFunction(functionName: string, functionBody: string): boolean {
+  return isCodeQualityStandard(functionName, functionBody);
+}
