@@ -52,3 +52,130 @@ alwaysApply: true
 - Only make changes directly requested or clearly necessary
 - Don't add features or abstractions beyond scope
 - Don't design for hypothetical future requirements
+
+const getRules = () => {
+  const rules = {
+    'SOLID Principles': [
+      {
+        name: 'Single Responsibility',
+        description: 'One function, one job. One class, one purpose.',
+      },
+      {
+        name: 'Open/Closed',
+        description: 'Extend via composition, not modification.',
+      },
+      {
+        name: 'Liskov Substitution',
+        description: 'Subtypes must be substitutable for base types.',
+      },
+      {
+        name: 'Interface Segregation',
+        description: 'Small, focused interfaces over large, general ones.',
+      },
+      {
+        name: 'Dependency Inversion',
+        description: 'Depend on abstractions; inject dependencies, don't import concrete implementations.',
+      },
+    ],
+    'DRY': [
+      {
+        name: 'Flag Repetition',
+        description: 'Aggressively abstract repeated patterns into utilities.',
+      },
+      {
+        name: 'One Source of Truth',
+        description: 'One source of truth for validation logic, constants, configs.',
+      },
+      {
+        name: 'Don\'t Over-Abstract',
+        description: 'Three similar lines often beats a premature abstraction.',
+      },
+    ],
+    'Clean Code': {
+      'Naming': [
+        {
+          name: 'Intention-Revealing Names',
+          description: 'Intention-revealing names; avoid abbreviations; be consistent and searchable.',
+        },
+        {
+          name: 'Avoid Abbreviations',
+          description: 'Avoid abbreviations; be consistent and searchable.',
+        },
+      ],
+      'Functions': [
+        {
+          name: 'Small Functions',
+          description: 'Small (<20 lines), single-purpose, 0-3 args, return early to reduce nesting.',
+        },
+        {
+          name: 'Avoid Side Effects',
+          description: 'Avoid side effects when possible.',
+        },
+        {
+          name: 'Explicit Over Clever',
+          description: 'Explicit over clever — bias toward readable, intentional code.',
+        },
+      ],
+      'Comments': [
+        {
+          name: 'Self-Documenting Code',
+          description: 'Code should be self-documenting; comments explain *why*, not *what*.',
+        },
+        {
+          name: 'Delete Commented-Out Code',
+          description: 'Delete commented-out code (use git).',
+        },
+      ],
+    },
+    'Error Handling': [
+      {
+        name: 'Never Swallow Errors',
+        description: 'Never swallow errors silently.',
+      },
+      {
+        name: 'Provide Meaningful Error Messages',
+        description: 'Provide meaningful error messages with context.',
+      },
+      {
+        name: 'Fail Fast',
+        description: 'Fail fast with clear diagnostics.',
+      },
+      {
+        name: 'Handle Errors at the Appropriate Level',
+        description: 'Handle errors at the appropriate level.',
+      },
+    ],
+    'Immutability': [
+      {
+        name: 'Prefer Immutable Updates',
+        description: 'Prefer immutable updates: `{ ...user, name: newName }` over `user.name = newName`.',
+      },
+      {
+        name: 'Prefer Pure Functions',
+        description: 'Prefer pure functions.',
+      },
+    ],
+    '"Engineered Enough"': [
+      {
+        name: 'No Hacky or Fragile Code',
+        description: 'No hacky or fragile code, but no over-engineered premature abstractions either.',
+      },
+      {
+        name: 'Only Make Necessary Changes',
+        description: 'Only make changes directly requested or clearly necessary.',
+      },
+      {
+        name: 'Don\'t Add Features or Abstractions Beyond Scope',
+        description: 'Don\'t add features or abstractions beyond scope.',
+      },
+      {
+        name: 'Don\'t Design for Hypothetical Future Requirements',
+        description: 'Don\'t design for hypothetical future requirements.',
+      },
+    ],
+  };
+
+  return rules;
+};
+
+export default getRules;
