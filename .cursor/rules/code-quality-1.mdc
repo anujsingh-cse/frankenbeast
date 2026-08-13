@@ -52,3 +52,45 @@ alwaysApply: true
 - Only make changes directly requested or clearly necessary
 - Don't add features or abstractions beyond scope
 - Don't design for hypothetical future requirements
+
+# Code Quality Standards Enforcement
+
+## Tool Registration
+
+- Tools are registered dynamically using the `registerTool` function
+- Tool names are not hardcoded to ensure flexibility and maintainability
+
+## Log Messages
+
+- Log messages are updated to reflect the latest tool registration and configuration
+- Stale log messages are removed to prevent confusion and improve readability
+
+## Backwards Compatibility
+
+- Backwards compatibility is preserved unless explicitly instructed otherwise
+- Existing functionality is not removed or altered without proper consideration
+
+## Type Hints and Import Structure
+
+- Type hints are preserved exactly to ensure clear and concise code
+- Import structure is maintained to prevent unnecessary imports and improve readability
+
+## Linter, Formatter, and Type Check Compliance
+
+- The code is 100% compliant with the linter, formatter, and type check
+- No syntax or typing errors are present to ensure smooth execution
+
+## Test Assertions
+
+- All unit and integration test assertions pass cleanly
+- No test failures or errors are present to ensure the code is thoroughly tested
+
+## Dead Code Removal
+
+- Dead code is removed to prevent unnecessary complexity and improve maintainability
+- Only necessary code is preserved to ensure the codebase remains lean and efficient
+
+## Repository Conventions
+
+- The code adheres to the repository's conventions and best practices
+- Code style, formatting, and naming conventions are maintained to ensure consistency and readability
