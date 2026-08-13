@@ -53,7 +53,7 @@ alwaysApply: true
 - Don't add features or abstractions beyond scope
 - Don't design for hypothetical future requirements
 
-const getRules = () => {
+const getRules = (): { [key: string]: any } => {
   const rules = {
     'SOLID Principles': [
       {
