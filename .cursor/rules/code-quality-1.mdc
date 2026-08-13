@@ -2,53 +2,141 @@
 description: Code quality standards - SOLID, DRY, clean code practices, naming, error handling, immutability. Universal across languages and frameworks.
 alwaysApply: true
 ---
+// Code Quality Standards
 
-# Code Quality Standards
+// SOLID Principles
+// Single Responsibility
+/**
+ * Returns the user email.
+ *
+ * @param {object} user - The user object.
+ * @returns {string} The user email.
+ */
+function getUserEmail(user) {
+  return user.email;
+}
 
-## SOLID Principles
+// Open/Closed
+class User {
+  constructor(id, email) {
+    this.id = id;
+    this.email = email;
+  }
+}
 
-- **Single Responsibility**: One function, one job. One class, one purpose.
-- **Open/Closed**: Extend via composition, not modification.
-- **Liskov Substitution**: Subtypes must be substitutable for base types.
-- **Interface Segregation**: Small, focused interfaces over large, general ones.
-- **Dependency Inversion**: Depend on abstractions; inject dependencies, don't import concrete implementations.
+class Admin extends User {
+  constructor(id, email, role) {
+    super(id, email);
+    this.role = role;
+  }
+}
 
-## DRY
+// Liskov Substitution
+class Animal {
+  sound() {
+    console.log('Generic animal sound');
+  }
+}
 
-- Flag repetition aggressively — abstract repeated patterns into utilities
-- One source of truth for validation logic, constants, configs
-- Don't over-abstract — three similar lines often beats a premature abstraction
+class Dog extends Animal {
+  sound() {
+    console.log('Woof!');
+  }
+}
 
-## Clean Code
+// Interface Segregation
+interface UserInterface {
+  getId(): number;
+  getEmail(): string;
+}
 
-### Naming
-- Intention-revealing names; avoid abbreviations; be consistent and searchable
-- ❌ `const e = getE(u)` → ✅ `const userEmail = getEmail(user)`
+interface AdminInterface extends UserInterface {
+  getRole(): string;
+}
 
-### Functions
-- Small (<20 lines), single-purpose, 0-3 args, return early to reduce nesting
-- Avoid side effects when possible
-- Explicit over clever — bias toward readable, intentional code
+class UserImpl implements UserInterface {
+  private id: number;
+  private email: string;
 
-### Comments
-- Code should be self-documenting; comments explain *why*, not *what*
-- Delete commented-out code (use git)
+  constructor(id: number, email: string) {
+    this.id = id;
+    this.email = email;
+  }
 
-## Error Handling
+  getId(): number {
+    return this.id;
+  }
 
-- Never swallow errors silently
-- Provide meaningful error messages with context
-- Fail fast with clear diagnostics
-- Handle errors at the appropriate level
+  getEmail(): string {
+    return this.email;
+  }
+}
 
-## Immutability
+class AdminImpl implements AdminInterface {
+  private id: number;
+  private email: string;
+  private role: string;
 
-- Prefer immutable updates: `{ ...user, name: newName }` over `user.name = newName`
-- Prefer pure functions
+  constructor(id: number, email: string, role: string) {
+    this.id = id;
+    this.email = email;
+    this.role = role;
+  }
 
-## "Engineered Enough"
+  getId(): number {
+    return this.id;
+  }
 
-- No hacky or fragile code, but no over-engineered premature abstractions either
-- Only make changes directly requested or clearly necessary
-- Don't add features or abstractions beyond scope
-- Don't design for hypothetical future requirements
+  getEmail(): string {
+    return this.email;
+  }
+
+  getRole(): string {
+    return this.role;
+  }
+}
+
+// Dependency Inversion
+class Logger {
+  log(message: string) {
+    console.log(message);
+  }
+}
+
+class LoggerImpl implements Logger {
+  log(message: string) {
+    console.log(message);
+  }
+}
+
+// DRY
+const repeat = (str: string, count: number) => {
+  let result = '';
+  for (let i = 0; i < count; i++) {
+    result += str;
+  }
+  return result;
+};
+
+// Clean Code
+function getUserName(user: { name: string }) {
+  return user.name;
+}
+
+// Error Handling
+function divide(a: number, b: number): number | string {
+  if (b === 0) {
+    throw new Error('Cannot divide by zero!');
+  }
+  return a / b;
+}
+
+// Immutability
+const user = { name: 'John', age: 30 };
+
+const updatedUser = { ...user, name: 'Jane' };
+
+// "Engineered Enough"
+function add(a: number, b: number): number {
+  return a + b;
+}
