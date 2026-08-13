@@ -52,3 +52,57 @@ alwaysApply: true
 - Only make changes directly requested or clearly necessary
 - Don't add features or abstractions beyond scope
 - Don't design for hypothetical future requirements
+
+# Tool Registration
+
+## Dynamic Tool Registration
+
+```python
+import importlib
+from typing import Dict, Any
+
+def get_registered_tools() -> Dict[str, Any]:
+    """Returns a dictionary of registered tools"""
+    tools = {}
+    for tool_name in get_tool_names():
+        try:
+            tool_module = importlib.import_module(f".{tool_name}", __name__)
+            tool = tool_module.get_tool()
+            tools[tool_name] = tool
+        except ImportError as e:
+            print(f"Error importing tool {tool_name}: {e}")
+    return tools
+
+def get_tool_names() -> list:
+    """Returns a list of tool names"""
+    tool_names = []
+    for filename in os.listdir("."):
+        if filename.endswith(".py") and filename != __file__:
+            tool_names.append(filename[:-3])
+    return tool_names
+```
+
+# Code Snippets
+
+## Example of Intention-Revealing Names
+
+```python
+def get_user_email(user: dict) -> str:
+    """Returns the user's email"""
+    return user.get("email")
+```
+
+## Example of Immutable Updates
+
+```python
+def update_user_name(user: dict, new_name: str) -> dict:
+    """Returns an updated user dictionary with the new name"""
+    return {**user, "name": new_name}
+```
+
+## Example of Pure Function
+
+```python
+def get_user_age(user: dict) -> int:
+    """Returns the user's age"""
+    return user["age"]
