@@ -1,54 +1,373 @@
----
 description: Code quality standards - SOLID, DRY, clean code practices, naming, error handling, immutability. Universal across languages and frameworks.
 alwaysApply: true
----
 
-# Code Quality Standards
+// Code Quality Standards
 
-## SOLID Principles
+// SOLID Principles
 
-- **Single Responsibility**: One function, one job. One class, one purpose.
-- **Open/Closed**: Extend via composition, not modification.
-- **Liskov Substitution**: Subtypes must be substitutable for base types.
-- **Interface Segregation**: Small, focused interfaces over large, general ones.
-- **Dependency Inversion**: Depend on abstractions; inject dependencies, don't import concrete implementations.
+/**
+ * Single Responsibility: One function, one job. One class, one purpose.
+ */
+function singleResponsibility(): void {
+  // One function, one job
+  const user = {
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
 
-## DRY
+  // One class, one purpose
+  class User {
+    private name: string;
+    private email: string;
 
-- Flag repetition aggressively — abstract repeated patterns into utilities
-- One source of truth for validation logic, constants, configs
-- Don't over-abstract — three similar lines often beats a premature abstraction
+    constructor(name: string, email: string) {
+      this.name = name;
+      this.email = email;
+    }
 
-## Clean Code
+    public getName(): string {
+      return this.name;
+    }
 
-### Naming
-- Intention-revealing names; avoid abbreviations; be consistent and searchable
-- ❌ `const e = getE(u)` → ✅ `const userEmail = getEmail(user)`
+    public getEmail(): string {
+      return this.email;
+    }
+  }
 
-### Functions
-- Small (<20 lines), single-purpose, 0-3 args, return early to reduce nesting
-- Avoid side effects when possible
-- Explicit over clever — bias toward readable, intentional code
+  const userInstance = new User('John Doe', 'john@example.com');
+  console.log(userInstance.getName()); // John Doe
+  console.log(userInstance.getEmail()); // john@example.com
+}
 
-### Comments
-- Code should be self-documenting; comments explain *why*, not *what*
-- Delete commented-out code (use git)
+/**
+ * Open/Closed: Extend via composition, not modification.
+ */
+function openClosed(): void {
+  // Extend via composition
+  class Vehicle {
+    public drive(): void {
+      console.log('Driving...');
+    }
+  }
 
-## Error Handling
+  class Car extends Vehicle {
+    public honk(): void {
+      console.log('Honking...');
+    }
+  }
 
-- Never swallow errors silently
-- Provide meaningful error messages with context
-- Fail fast with clear diagnostics
-- Handle errors at the appropriate level
+  const car = new Car();
+  car.drive(); // Driving...
+  car.honk(); // Honking...
+}
 
-## Immutability
+/**
+ * Liskov Substitution: Subtypes must be substitutable for base types.
+ */
+function liskovSubstitution(): void {
+  // Subtypes must be substitutable for base types
+  class Animal {
+    public sound(): void {
+      console.log('Animal makes a sound...');
+    }
+  }
 
-- Prefer immutable updates: `{ ...user, name: newName }` over `user.name = newName`
-- Prefer pure functions
+  class Dog extends Animal {
+    public sound(): void {
+      console.log('Dog barks...');
+    }
+  }
 
-## "Engineered Enough"
+  const animal = new Animal();
+  animal.sound(); // Animal makes a sound...
 
-- No hacky or fragile code, but no over-engineered premature abstractions either
-- Only make changes directly requested or clearly necessary
-- Don't add features or abstractions beyond scope
-- Don't design for hypothetical future requirements
+  const dog = new Dog();
+  dog.sound(); // Dog barks...
+}
+
+/**
+ * Interface Segregation: Small, focused interfaces over large, general ones.
+ */
+function interfaceSegregation(): void {
+  // Small, focused interfaces
+  interface Printable {
+    print(): void;
+  }
+
+  interface Scanable {
+    scan(): void;
+  }
+
+  class Document implements Printable, Scanable {
+    public print(): void {
+      console.log('Printing...');
+    }
+
+    public scan(): void {
+      console.log('Scanning...');
+    }
+  }
+
+  const document = new Document();
+  document.print(); // Printing...
+  document.scan(); // Scanning...
+}
+
+/**
+ * Dependency Inversion: Depend on abstractions; inject dependencies, don't import concrete implementations.
+ */
+function dependencyInversion(): void {
+  // Depend on abstractions
+  class Logger {
+    public log(message: string): void {
+      console.log(message);
+    }
+  }
+
+  class ConsoleLogger implements Logger {
+    public log(message: string): void {
+      console.log(message);
+    }
+  }
+
+  const logger = new ConsoleLogger();
+  logger.log('Hello, World!'); // Hello, World!
+}
+
+// DRY
+
+/**
+ * Flag repetition aggressively — abstract repeated patterns into utilities
+ */
+function flagRepetition(): void {
+  // Abstract repeated patterns into utilities
+  function repeat(flag: boolean, times: number): void {
+    for (let i = 0; i < times; i++) {
+      if (flag) {
+        console.log('Flag is true...');
+      } else {
+        console.log('Flag is false...');
+      }
+    }
+  }
+
+  repeat(true, 3); // Flag is true...
+  repeat(false, 3); // Flag is false...
+}
+
+/**
+ * One source of truth for validation logic, constants, configs
+ */
+function oneSourceOfTruth(): void {
+  // One source of truth
+  const config = {
+    port: 3000,
+    host: 'localhost',
+  };
+
+  function validateConfig(config: { port: number; host: string }): void {
+    if (config.port !== 3000) {
+      throw new Error('Invalid port...');
+    }
+
+    if (config.host !== 'localhost') {
+      throw new Error('Invalid host...');
+    }
+  }
+
+  validateConfig(config); // No errors
+}
+
+// Clean Code
+
+/**
+ * Naming
+ * Intention-revealing names; avoid abbreviations; be consistent and searchable
+ */
+function naming(): void {
+  // Intention-revealing names
+  const user = {
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
+
+  function getEmail(user: { email: string }): string {
+    return user.email;
+  }
+
+  console.log(getEmail(user)); // john@example.com
+}
+
+/**
+ * Functions
+ * Small (<20 lines), single-purpose, 0-3 args, return early to reduce nesting
+ */
+function functions(): void {
+  // Small, single-purpose functions
+  function add(a: number, b: number): number {
+    return a + b;
+  }
+
+  function multiply(a: number, b: number): number {
+    return a * b;
+  }
+
+  console.log(add(2, 3)); // 5
+  console.log(multiply(2, 3)); // 6
+}
+
+/**
+ * Comments
+ * Code should be self-documenting; comments explain *why*, not *what*
+ */
+function comments(): void {
+  // Code should be self-documenting
+  function calculateArea(radius: number): number {
+    // The area of a circle is calculated using the formula πr^2
+    return Math.PI * radius ** 2;
+  }
+
+  console.log(calculateArea(5)); // 78.53981633974483
+}
+
+// Error Handling
+
+/**
+ * Never swallow errors silently
+ */
+function errorHandling(): void {
+  // Never swallow errors silently
+  try {
+    const user = {
+      name: 'John Doe',
+      email: 'john@example.com',
+    };
+
+    function getEmail(user: { email: string }): string {
+      return user.email;
+    }
+
+    console.log(getEmail(user)); // john@example.com
+  } catch (error) {
+    console.error(error); // Error: Cannot read property 'email' of undefined
+  }
+}
+
+/**
+ * Provide meaningful error messages with context
+ */
+function provideMeaningfulErrorMessages(): void {
+  // Provide meaningful error messages
+  try {
+    const user = {
+      name: 'John Doe',
+      email: 'john@example.com',
+    };
+
+    function getEmail(user: { email: string }): string {
+      return user.email;
+    }
+
+    console.log(getEmail(user)); // john@example.com
+  } catch (error) {
+    console.error(`Error: ${error.message}`); // Error: Cannot read property 'email' of undefined
+  }
+}
+
+// Immutability
+
+/**
+ * Prefer immutable updates: `{ ...user, name: newName }` over `user.name = newName`
+ */
+function immutability(): void {
+  // Prefer immutable updates
+  const user = {
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
+
+  const updateUser = { ...user, name: 'Jane Doe' };
+  console.log(updateUser); // { name: 'Jane Doe', email: 'john@example.com' }
+}
+
+/**
+ * Prefer pure functions
+ */
+function pureFunctions(): void {
+  // Prefer pure functions
+  function add(a: number, b: number): number {
+    return a + b;
+  }
+
+  console.log(add(2, 3)); // 5
+}
+
+// "Engineered Enough"
+
+/**
+ * No hacky or fragile code, but no over-engineered premature abstractions either
+ */
+function engineeredEnough(): void {
+  // No hacky or fragile code
+  const user = {
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
+
+  function getEmail(user: { email: string }): string {
+    return user.email;
+  }
+
+  console.log(getEmail(user)); // john@example.com
+}
+
+/**
+ * Only make changes directly requested or clearly necessary
+ */
+function onlyMakeChangesDirectlyRequested(): void {
+  // Only make changes directly requested
+  const user = {
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
+
+  function getEmail(user: { email: string }): string {
+    return user.email;
+  }
+
+  console.log(getEmail(user)); // john@example.com
+}
+
+/**
+ * Don't add features or abstractions beyond scope
+ */
+function dontAddFeaturesOrAbstractionsBeyondScope(): void {
+  // Don't add features or abstractions beyond scope
+  const user = {
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
+
+  function getEmail(user: { email: string }): string {
+    return user.email;
+  }
+
+  console.log(getEmail(user)); // john@example.com
+}
+
+/**
+ * Don't design for hypothetical future requirements
+ */
+function dontDesignForHypotheticalFutureRequirements(): void {
+  // Don't design for hypothetical future requirements
+  const user = {
+    name: 'John Doe',
+    email: 'john@example.com',
+  };
+
+  function getEmail(user: { email: string }): string {
+    return user.email;
+  }
+
+  console.log(getEmail(user)); // john@example.com
+}
